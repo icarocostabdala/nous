@@ -1,14 +1,12 @@
+// src/app.module.ts
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MoviesService } from "./application/services/movies.service";
 import databaseConfig from "./configuration";
 import { MongoProvider } from "./infrastructure/database/mongo.provider";
-import { MovieRepositoryImpl } from "./infrastructure/repositories/movie.repository.impl";
-import { Movie, MovieSchema } from "./infrastructure/schemas/movie.schema";
+import { InfrastructureModule } from "./infrastructure/infrastructure.module";
 import { MoviesController } from "./presentation/controllers/movies.controller";
-
-const MOVIE_REPOSITORY = "MOVIE_REPOSITORY";
 
 @Module({
   imports: [
@@ -22,13 +20,10 @@ const MOVIE_REPOSITORY = "MOVIE_REPOSITORY";
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([{ name: Movie.name, schema: MovieSchema }]),
+    InfrastructureModule,
     MongoProvider,
   ],
   controllers: [MoviesController],
-  providers: [
-    MoviesService,
-    { provide: MOVIE_REPOSITORY, useClass: MovieRepositoryImpl },
-  ],
+  providers: [MoviesService],
 })
 export class AppModule {}

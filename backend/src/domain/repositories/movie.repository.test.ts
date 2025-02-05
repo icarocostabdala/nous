@@ -42,6 +42,7 @@ describe("Movie Repository", () => {
     repository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      insertMany: jest.fn(),
     };
   });
 

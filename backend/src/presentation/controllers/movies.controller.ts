@@ -72,7 +72,7 @@ export class MoviesController {
             }
             resolve({ message: "CSV file processed successfully" });
           } catch (error: any) {
-            reject(error); // Rejeita com o erro já tratado
+            reject(error);
           }
         })
         .on("error", (error: any) =>
@@ -84,7 +84,7 @@ export class MoviesController {
           )
         );
     }).catch((error) => {
-      throw error; // Lança o erro para ser capturado pelo NestJS
+      throw error;
     });
   }
 
@@ -97,9 +97,11 @@ export class MoviesController {
     const producerWins: { [key: string]: number[] } = {};
 
     movies.forEach((movie: any) => {
-      if (movie.winner) {
-        movie.producers.split(",").forEach((producer: any) => {
-          producer = producer.trim();
+      if (movie.winner && movie.producers && movie.year) {
+        const producers = movie.producers
+          .split(",")
+          .map((producer: string) => producer.trim());
+        producers.forEach((producer: string) => {
           if (!producerWins[producer]) {
             producerWins[producer] = [];
           }
@@ -122,12 +124,19 @@ export class MoviesController {
       }
     }
 
+    if (intervals.length === 0) {
+      return { min: [], max: [] };
+    }
+
     const minInterval = Math.min(...intervals.map((i) => i.interval));
     const maxInterval = Math.max(...intervals.map((i) => i.interval));
 
+    const minIntervals = intervals.filter((i) => i.interval === minInterval);
+    const maxIntervals = intervals.filter((i) => i.interval === maxInterval);
+
     return {
-      min: intervals.filter((i) => i.interval === minInterval),
-      max: intervals.filter((i) => i.interval === maxInterval),
+      min: minIntervals,
+      max: maxIntervals,
     };
   }
 }
